@@ -2,26 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- REQUIRED PERMISSIONS -->
+    <!-- Permissions required by the gateway and services -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- REQUIRED FOR FOREGROUND SERVICES IN ANDROID 14+ -->
+    <!-- Necessary for Foreground Services in Android 14+ (specialUse type) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     
-    <!-- WhatsApp Automation specific (needs confirmation) -->
+    <!-- Required to register the Accessibility Service -->
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
 
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        android:theme="@style/Theme.MessageGateway"
         tools:targetApi="34">
 
         <!-- The main screen -->
@@ -34,14 +36,14 @@
             </intent-filter>
         </activity>
 
-        <!-- The Gateway Background Service (Foreground Service) -->
+        <!-- YOUR GatewayService (Foreground Service) -->
         <service
             android:name=".GatewayService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
-        <!-- The WhatsApp Clicker Accessibility Service (Crucial!) -->
+        <!-- YOUR WhatsApp Automation Accessibility Service -->
         <service
             android:name=".WhatsAppClickerService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -49,7 +51,7 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-            <!-- Accessibility configuration file reference -->
+            <!-- Reference to the config file which we will assume exists based on rebuild efforts -->
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/whatsapp_accessibility_service" />
