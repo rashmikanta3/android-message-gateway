@@ -1,61 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp">
+    android:orientation="vertical"
+    android:background="#121212"
+    android:padding="24dp">
 
-    <LinearLayout
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MessageGateway"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gateway Configuration"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="API / Queue Endpoint URL:"
+        android:textColor="#AAAAAA"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/etApiUrl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="https://6a9dade6a1b37296ad4c229a.mockapi.io/messages"
+        android:textColor="#80D8FF"
+        android:textColorHint="#555555"
+        android:textSize="14sp"
+        android:backgroundTint="#80D8FF"
+        android:layout_marginBottom="16dp" />
 
-        <TextView
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Channel / Tag Filter:"
+        android:textColor="#AAAAAA"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/etChannel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ALL"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:backgroundTint="#888888"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WhatsApp Client:"
+        android:textColor="#AAAAAA"
+        android:textSize="13sp"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/rgWhatsAppType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/rbWhatsApp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gateway Configuration"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
+            android:text="WhatsApp"
+            android:textColor="#FFFFFF"
+            android:checked="true"
+            android:layout_marginEnd="16dp" />
 
-        <TextView
+        <RadioButton
+            android:id="@+id/rbWhatsAppBusiness"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="API / Queue Endpoint URL:" />
+            android:text="WhatsApp Business"
+            android:textColor="#FFFFFF" />
+    </RadioGroup>
 
-        <EditText
-            android:id="@+id/etApiUrl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="https://your-id.mockapi.io/api/v1/messages"
-            android:inputType="textUri"
-            android:layout_marginBottom="12dp" />
+    <Button
+        android:id="@+id/btnSaveStart"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="SAVE AND START SERVICE"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Channel / Tag Filter:" />
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service: Idle"
+        android:textColor="#AAAAAA"
+        android:textSize="14sp" />
 
-        <EditText
-            android:id="@+id/etChannel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="SMS or WHATSAPP"
-            android:text="SMS"
-            android:layout_marginBottom="20dp" />
-
-        <Button
-            android:id="@+id/btnSaveStart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save and Start Service" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Service: Idle"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

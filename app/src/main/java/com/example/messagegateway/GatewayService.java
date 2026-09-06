@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -51,7 +50,7 @@ public class GatewayService extends Service {
         createNotificationChannel();
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Message Gateway")
-                .setContentText("Gateway service active & listening")
+                .setContentText("Connected to queue. Polling messages...")
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
                 .build();
         startForeground(1, notification);
@@ -60,13 +59,10 @@ public class GatewayService extends Service {
     }
 
     private void pollNextMessage() {
-        SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE);
-        String apiUrl = prefs.getString(MainActivity.KEY_API_URL, "").trim();
-        String selectedChannel = prefs.getString(MainActivity.KEY_CHANNEL, "SMS").trim();
-
-        if (apiUrl.isEmpty()) {
-            return;
-        }
+        SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE);
+        String apiUrl = prefs.getString(MainActivity.KEY_API_URL, "https://6a9dade6a1b37296ad4c229a.mockapi.io/messages");
+        String filterChannel = prefs.getString(MainActivity.KEY_CHANNEL, "ALL");
+        String waPackage = prefs.getString(MainActivity.KEY_WA_PACKAGE, "com.whatsapp");
 
         try {
             Request request = new Request.Builder()
@@ -85,20 +81,23 @@ public class GatewayService extends Service {
                 String message = item.getString("message_body");
                 String channel = item.optString("channel", "SMS");
 
-                if (!"ALL".equalsIgnoreCase(selectedChannel) && !channel.equalsIgnoreCase(selectedChannel)) {
+                // Check filter if not ALL
+                if (!"ALL".equalsIgnoreCase(filterChannel) && !filterChannel.equalsIgnoreCase(channel)) {
                     return;
                 }
+
+                Log.d(TAG, "Processing ID: " + id + " via " + channel);
 
                 if ("SMS".equalsIgnoreCase(channel)) {
                     sendSms(phone, message);
                 } else if ("WHATSAPP".equalsIgnoreCase(channel)) {
-                    sendWhatsApp(phone, message);
+                    sendWhatsApp(phone, message, waPackage);
                 }
 
                 updateStatus(apiUrl, id, "SENT");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Polling error", e);
+            Log.e(TAG, "Queue poll error", e);
         }
     }
 
@@ -111,21 +110,24 @@ public class GatewayService extends Service {
                 smsManager = SmsManager.getDefault();
             }
             smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-            Log.d(TAG, "SMS dispatched to: " + phoneNumber);
+            Log.d(TAG, "SMS sent to " + phoneNumber);
         } catch (Exception e) {
-            Log.e(TAG, "Failed SMS send", e);
+            Log.e(TAG, "SMS failed", e);
         }
     }
 
-    private void sendWhatsApp(String phoneNumber, String message) {
+    private void sendWhatsApp(String phoneNumber, String message, String waPackage) {
         try {
             String cleanNumber = phoneNumber.replace("+", "").replace(" ", "").trim();
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse("https://api.whatsapp.com/send?phone=" + cleanNumber + "&text=" + Uri.encode(message)));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setPackage(waPackage);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
             startActivity(intent);
+            Log.d(TAG, "Launched " + waPackage + " for " + phoneNumber);
         } catch (Exception e) {
-            Log.e(TAG, "Failed WhatsApp intent", e);
+            Log.e(TAG, "WhatsApp intent launch failed", e);
         }
     }
 
@@ -139,7 +141,7 @@ public class GatewayService extends Service {
                     .build();
             client.newCall(putRequest).execute().close();
         } catch (IOException e) {
-            Log.e(TAG, "Failed to update status on API", e);
+            Log.e(TAG, "Failed updating status", e);
         }
     }
 
